@@ -1,6 +1,6 @@
 package com.irelax.salesai.integration.twilio;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import com.irelax.salesai.config.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

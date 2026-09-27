@@ -1,7 +1,7 @@
 package com.irelax.salesai.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 import com.irelax.salesai.api.dto.MessagingApi;
 import com.irelax.salesai.domain.AiSuggestion;
 import org.springframework.stereotype.Component;
@@ -11,9 +11,9 @@ import java.util.List;
 
 @Component
 public class AiSuggestionMapper {
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
 
-    public AiSuggestionMapper(ObjectMapper objectMapper) { this.objectMapper = objectMapper; }
+    public AiSuggestionMapper(JsonMapper objectMapper) { this.objectMapper = objectMapper; }
 
     public MessagingApi.AiSuggestionResponse map(AiSuggestion s) {
         List<String> products = Collections.emptyList();

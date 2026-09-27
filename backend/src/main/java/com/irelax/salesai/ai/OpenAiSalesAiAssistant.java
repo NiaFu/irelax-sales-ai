@@ -1,7 +1,7 @@
 package com.irelax.salesai.ai;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import com.irelax.salesai.config.AppProperties;
 import com.irelax.salesai.domain.*;
 import org.springframework.http.MediaType;
@@ -14,12 +14,12 @@ import java.util.*;
 public class OpenAiSalesAiAssistant implements SalesAiAssistant {
     private final AppProperties properties;
     private final RestClient.Builder restClientBuilder;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
     private final RuleBasedSalesAiAssistant fallback;
 
     public OpenAiSalesAiAssistant(AppProperties properties,
                                   RestClient.Builder restClientBuilder,
-                                  ObjectMapper objectMapper,
+                                  JsonMapper objectMapper,
                                   RuleBasedSalesAiAssistant fallback) {
         this.properties = properties;
         this.restClientBuilder = restClientBuilder;

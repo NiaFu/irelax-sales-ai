@@ -1,6 +1,6 @@
 package com.irelax.salesai.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.irelax.salesai.ai.SalesAiAssistant;
 import com.irelax.salesai.ai.SalesAiResult;
 import com.irelax.salesai.api.dto.MessagingApi;
@@ -32,14 +32,14 @@ public class AiProcessingService {
     private final AiSuggestionRepository suggestions;
     private final CustomerProductInterestRepository interests;
     private final SalesAiAssistant aiAssistant;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper objectMapper;
     private final FollowUpService followUpService;
     private final AiSuggestionMapper mapper;
 
     public AiProcessingService(MessageRepository messages, ProductRepository products, KnowledgeEntryRepository knowledge,
                                SalesAssistantProfileRepository profiles, AiSuggestionRepository suggestions,
                                CustomerProductInterestRepository interests, SalesAiAssistant aiAssistant,
-                               ObjectMapper objectMapper, FollowUpService followUpService, AiSuggestionMapper mapper) {
+                               JsonMapper objectMapper, FollowUpService followUpService, AiSuggestionMapper mapper) {
         this.messages = messages;
         this.products = products;
         this.knowledge = knowledge;
