@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "iRelax Sales AI",
+    "slug": "irelax-sales-ai",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.irelax.salesai"
+    },
+    "android": {
+      "package": "com.irelax.salesai"
+    }
+  }
+}

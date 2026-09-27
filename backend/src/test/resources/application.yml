@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:irelax;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+app:
+  auth:
+    enabled: false
+    issuer-uri: ""
+    dev-owner-id: test-owner
+  twilio:
+    account-sid: ""
+    auth-token: ""
+    phone-number: "+61400000000"
+    status-callback-url: ""
+    webhook-base-url: ""
+    owner-id: test-owner
+    mock-enabled: true
+  open-ai:
+    api-key: ""
+    model: gpt-6-luna
+    base-url: https://api.openai.com
+  cors:
+    allowed-origins:
+      - http://localhost:8081

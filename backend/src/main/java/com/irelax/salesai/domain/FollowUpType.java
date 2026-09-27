@@ -1,0 +1,3 @@
+package com.irelax.salesai.domain;
+
+public enum FollowUpType { GENERAL_FOLLOW_UP, QUOTE_FOLLOW_UP, VISIT_FOLLOW_UP, NO_RESPONSE, DELIVERY_CHECK, POST_SALE_7_DAY, POST_SALE_30_DAY, CUSTOM }

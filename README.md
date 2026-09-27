@@ -1,172 +1,173 @@
 # iRelax Sales AI
 
-A mobile-first AI sales assistant for iRelax massage-chair sales.
+Mobile-first AI sales assistant for iRelax massage-chair sales.
 
-## V1 Goal
+The V1 implementation is centered on SMS conversations: incoming customer messages become CRM activity, AI drafts a context-aware reply, the salesperson reviews it, and the system keeps the customer record and follow-up queue updated.
 
-The first version focuses on the sales workflow around customer SMS conversations:
+## Implemented V1 flow
 
 ```text
 Customer sends SMS
-→ system identifies or creates the customer
-→ conversation is saved
-→ AI loads customer history + product knowledge + sales style
-→ AI generates a suggested reply
-→ salesperson reviews/edits
-→ reply is sent
-→ customer state is updated
-→ follow-up task is created when needed
+        ↓
+Twilio webhook
+        ↓
+Normalize phone + match/create customer
+        ↓
+Persist conversation and inbound message
+        ↓
+Asynchronous AI analysis
+        ↓
+Customer history + product data + sales knowledge + recent messages
+        ↓
+Draft reply + intent + product detection + follow-up suggestion
+        ↓
+Mobile app review/edit
+        ↓
+Salesperson presses Send
+        ↓
+Twilio sends SMS + delivery status is tracked
+        ↓
+CRM timeline and follow-up tasks stay updated
 ```
 
-## Core Features
+## What is included
 
-### 1. Messaging
-- Receive inbound customer SMS
-- Match phone numbers to customer profiles
-- Store complete conversation history
-- Draft AI replies
-- Review/edit before sending
-- Send outbound SMS
-- Track message delivery status
+### Mobile app
 
-### 2. Customer CRM
-Each customer can store:
-- First name / last name
-- Phone number
-- Preferred contact channel
-- First visit date and location
-- Visit feedback
-- Budget
-- Interested products
-- AI-predicted alternative products
-- Sales stage
-- Notes
-- Last contact
-- Next follow-up
+Expo / React Native application with four main areas:
 
-### 3. AI Sales Assistant
-AI context can include:
-- Customer profile
-- Recent conversation history
-- Visit notes
-- Interested products
-- Approved iRelax product data
-- Sales scripts and communication style
+- **Today** — due/overdue follow-ups, hot customers, new leads, recent conversations
+- **Messages** — SMS conversation list, customer thread, AI draft, edit and send
+- **Customers** — CRM profile, sales stage, visit feedback, product interests and notes
+- **AI Assistant** — structured CRM queries such as follow-ups, HOT customers and stale leads
 
-V1 uses **AI drafts only**. Messages are not automatically sent without approval.
+### Spring Boot backend
 
-### 4. Follow-up Automation
-The system can create tasks such as:
-- General follow-up
-- Quote follow-up
-- Visit follow-up
-- No-response follow-up
-- Delivery check
-- 7-day post-sale check
-- 30-day post-sale check
+- Customer CRM CRUD
+- Customer notes
+- Customer-stated product interests
+- AI-predicted product interests stored separately
+- SMS conversation/message persistence
+- Twilio inbound webhook
+- Twilio outbound SMS
+- Twilio delivery status callback
+- Twilio signature validation
+- OpenAI Responses API integration using Structured Outputs
+- Conservative local AI fallback when no OpenAI key is configured
+- Follow-up task engine
+- Automatic post-sale tasks when a customer becomes `SOLD`
+- Product knowledge CRUD
+- Sales knowledge entries
+- Configurable salesperson tone/rules
+- Optional Supabase-compatible JWT resource-server authentication
+- Flyway PostgreSQL schema
 
-### 5. Product Knowledge
-Product information will be stored in a controlled database and later supplemented by:
-- iRelax website information
-- Product manuals
-- Sales notes
-- Product comparisons
+## Important AI rules
 
-Structured data is preferred for important facts such as price, warranty, dimensions and features.
+The system deliberately separates customer facts from AI inference.
 
-## Mobile App
+```text
+CUSTOMER source
+"I like ROBO"
 
-Planned main tabs:
+AI source
+"Meister may also suit this customer"
+```
 
-### Today
-- Follow-ups due today
-- Overdue follow-ups
-- New leads
-- Hot customers
-- Recent incoming messages
-- Post-sale tasks
+AI-generated product interests are stored as `InterestSource.AI` and include confidence/reason metadata. They do not overwrite customer-stated facts.
 
-### Messages
-- Customer conversation list
-- Full SMS history
-- AI reply suggestion
-- Edit / regenerate / send
+The AI also does **not** autonomously send customer messages. V1 always requires the salesperson to review/edit and press **Send**.
 
-### Customers
-- Search and filter customers
-- Customer profile
-- Product interests
-- Sales stage
-- Timeline
-- Notes and follow-ups
+Critical commercial facts should come from structured product/knowledge data. The AI is instructed not to invent:
 
-### AI Assistant
-Examples:
-- “Who should I follow up today?”
-- “Show customers interested in ROBO.”
-- “Write a softer follow-up for Peter.”
-- “Which customers have not replied for 7 days?”
+- prices or discounts
+- warranty terms
+- stock availability
+- delivery promises
+- refunds
+- medical claims
 
-## Planned Tech Stack
+## Tech stack
 
 ### Mobile
-- React Native
+
+- Expo SDK 57
+- React Native 0.86
+- React 19.2
 - TypeScript
 
 ### Backend
+
 - Java 21
-- Spring Boot
-- REST API
+- Spring Boot 4.1.1
+- Spring MVC / RestClient
+- Spring Data JPA
+- Spring Security resource server
+- Flyway
+- PostgreSQL / Supabase PostgreSQL
 
-### Database
-- PostgreSQL
-- Supabase
+### Integrations
 
-### Messaging
-- Twilio SMS
+- Twilio Programmable Messaging
+- OpenAI Responses API
 
-### AI
-- OpenAI API
-
-## High-Level Architecture
+## Repository structure
 
 ```text
-React Native Mobile App
-        |
-        | REST API
-        v
-Spring Boot Backend
-        |
-        +-- Customer Service
-        +-- Messaging Service
-        +-- AI Service
-        +-- Follow-up Service
-        +-- Product Service
-        +-- Knowledge Service
-        |
-        v
-Supabase PostgreSQL
-
-External Services:
-Twilio SMS
-OpenAI API
+irelax-sales-ai/
+├── backend/
+│   ├── pom.xml
+│   └── src/
+│       ├── main/java/com/irelax/salesai/
+│       │   ├── ai/
+│       │   ├── api/
+│       │   ├── auth/
+│       │   ├── common/
+│       │   ├── config/
+│       │   ├── domain/
+│       │   ├── integration/
+│       │   ├── repository/
+│       │   └── service/
+│       └── main/resources/
+│           └── db/migration/
+├── mobile/
+│   ├── App.tsx
+│   └── src/
+│       ├── screens/
+│       ├── api.ts
+│       ├── components.tsx
+│       ├── theme.ts
+│       └── types.ts
+├── docs/
+│   ├── api.md
+│   ├── architecture.md
+│   └── setup.md
+├── docker-compose.yml
+├── .env.example
+└── README.md
 ```
 
-## Initial Data Model
+## Customer data
 
-Main entities:
+The current CRM supports:
 
-- Customer
-- Conversation
-- Message
-- CustomerProductInterest
-- FollowUpTask
-- Product
-- CustomerNote
-- AISuggestion
-- SalesAssistantProfile
+- first name / last name
+- phone
+- email
+- preferred channel
+- sales stage
+- first visit date/location
+- first meeting feedback
+- budget range
+- notes
+- last contact
+- next follow-up
+- customer product interests
+- AI product predictions
+- customer notes
+- full SMS conversation history
 
-### Sales Stages
+### Sales stages
 
 ```text
 NEW
@@ -179,129 +180,189 @@ LOST
 AFTER_SALES
 ```
 
-Customer-stated product interest and AI predictions must be stored separately.
+## Follow-up automation
 
-## Messaging Flow
-
-### Incoming SMS
+Supported task types include:
 
 ```text
-Twilio webhook
-→ normalize phone number
-→ find customer
-→ create new lead if unknown
-→ save message
-→ analyse message
-→ generate AI draft
-→ notify mobile app
+GENERAL_FOLLOW_UP
+QUOTE_FOLLOW_UP
+VISIT_FOLLOW_UP
+NO_RESPONSE
+DELIVERY_CHECK
+POST_SALE_7_DAY
+POST_SALE_30_DAY
+CUSTOM
 ```
 
-### Outgoing SMS
+Changing a customer to `SOLD` creates delivery, 7-day and 30-day care tasks if they do not already exist.
+
+## Local development
+
+### 1. Start PostgreSQL
+
+```bash
+docker compose up -d postgres
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+For a no-cost local workflow, keep:
 
 ```text
-User approves draft
-→ backend sends via Twilio
-→ save external message ID
-→ update status
-→ delivery webhook updates SENT / DELIVERED / FAILED
+AUTH_ENABLED=false
+TWILIO_MOCK_ENABLED=true
+OPENAI_API_KEY=
 ```
 
-## AI Safety / Reliability Rules
+In that mode:
 
-The AI must not invent:
-- Prices
-- Discounts
-- Warranty terms
-- Stock availability
-- Delivery promises
-- Product specifications
+- outbound SMS is mocked rather than sent
+- OpenAI is replaced with a conservative local rules engine
+- the app still exercises the CRM/message/follow-up workflow
 
-These values should come from approved structured data or trusted knowledge sources.
+### 3. Run backend
 
-## Planned Repository Structure
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+Health:
 
 ```text
-irelax-sales-ai/
-├── mobile/
-│   └── src/
-│       ├── screens/
-│       ├── components/
-│       ├── services/
-│       ├── hooks/
-│       ├── navigation/
-│       ├── store/
-│       └── types/
-├── backend/
-│   └── src/main/
-│       ├── java/
-│       │   ├── customer/
-│       │   ├── messaging/
-│       │   ├── ai/
-│       │   ├── followup/
-│       │   ├── product/
-│       │   ├── knowledge/
-│       │   ├── auth/
-│       │   └── common/
-│       └── resources/
-├── docs/
-├── .env.example
-└── README.md
+GET http://localhost:8080/actuator/health
 ```
 
-## Implementation Order
+### 4. Run mobile app
 
-1. Project foundation
-2. Customer CRM
-3. SMS messaging
-4. AI reply drafts
-5. Customer/message analysis
-6. Follow-up automation
-7. Product knowledge
-8. Post-sale automation
-9. Authentication and security
-10. Testing and mobile polish
+```bash
+cd mobile
+npm install
+npm run start
+```
 
-## V1 Definition of Done
+For a physical phone, set `EXPO_PUBLIC_API_URL` to a backend address reachable from that device rather than `localhost`.
 
-V1 is successful when this workflow works reliably from the mobile app:
+See [docs/setup.md](docs/setup.md) for full setup instructions.
+
+## Twilio configuration
+
+For real SMS:
 
 ```text
-Customer sends SMS
-→ salesperson receives it in the app
-→ opens the customer profile
-→ sees previous conversation and visit context
-→ gets an AI reply suggestion
-→ edits or approves it
-→ sends the SMS
-→ conversation is saved
-→ system reminds salesperson when to follow up
+TWILIO_MOCK_ENABLED=false
+TWILIO_ACCOUNT_SID=...
+TWILIO_AUTH_TOKEN=...
+TWILIO_PHONE_NUMBER=...
+TWILIO_WEBHOOK_BASE_URL=https://your-api.example
+TWILIO_STATUS_CALLBACK_URL=https://your-api.example/api/webhooks/twilio/status
 ```
 
-## Not Included in Initial V1
+Configure the Twilio incoming-message webhook as:
 
-- Email integration
+```text
+POST https://your-api.example/api/webhooks/twilio/sms
+```
+
+Inbound webhooks are signature validated. AI processing is asynchronous so the Twilio webhook can return immediately.
+
+## OpenAI configuration
+
+```text
+OPENAI_API_KEY=...
+OPENAI_MODEL=gpt-6-luna
+```
+
+`gpt-6-luna` is the default for frequent sales drafting. The model is configurable without code changes.
+
+The AI context can include:
+
+- customer profile
+- visit feedback and notes
+- recent conversation history
+- active product data
+- sales knowledge entries
+- salesperson tone/rules
+- newest inbound message
+
+## Authentication
+
+Development defaults to single-user mode:
+
+```text
+AUTH_ENABLED=false
+DEV_OWNER_ID=nia
+```
+
+The backend can validate Supabase JWTs when enabled:
+
+```text
+AUTH_ENABLED=true
+SUPABASE_ISSUER_URI=https://YOUR_PROJECT.supabase.co/auth/v1
+```
+
+The authenticated JWT subject becomes the data owner ID.
+
+The current mobile client can send a development bearer token through `EXPO_PUBLIC_API_BEARER_TOKEN`. A production Supabase sign-in UI is intentionally left until the production Supabase project/authentication method is selected.
+
+## Tests
+
+Backend tests cover the application context, Australian phone normalization, fallback AI intent/product detection and Twilio request-signature logic.
+
+```bash
+cd backend
+mvn test
+```
+
+Mobile static check:
+
+```bash
+cd mobile
+npm run typecheck
+```
+
+## API
+
+See [docs/api.md](docs/api.md).
+
+Primary endpoints:
+
+```text
+GET    /api/dashboard/today
+GET    /api/customers
+POST   /api/customers
+GET    /api/conversations
+GET    /api/conversations/{id}
+POST   /api/conversations/{id}/send
+POST   /api/messages/{messageId}/ai-suggestion
+GET    /api/follow-ups
+POST   /api/follow-ups/{id}/complete
+GET    /api/products
+POST   /api/products
+GET    /api/knowledge
+POST   /api/knowledge
+POST   /api/assistant/query
+```
+
+## Not included yet
+
+The following were intentionally kept out of V1:
+
+- email integration
 - WhatsApp integration
 - WeChat integration
-- Fully automatic customer messaging
-- Voice calls
-- Complex machine-learning recommendation models
-- Multi-company support
-- Advanced analytics
+- direct reading of iPhone Messages history
+- automatic customer message sending without approval
+- voice calls
+- full live website scraping
+- complex ML recommendation models
+- multi-company administration
+- advanced analytics
+- production Supabase sign-in UI
 
-## Secrets and Configuration
-
-Credentials must never be committed to GitHub.
-
-Expected environment variables will include:
-
-```text
-OPENAI_API_KEY
-TWILIO_ACCOUNT_SID
-TWILIO_AUTH_TOKEN
-TWILIO_PHONE_NUMBER
-SUPABASE_URL
-SUPABASE_DB_URL
-SUPABASE_KEY
-```
-
-A safe `.env.example` will be added during implementation.
+The data model is designed so additional conversation channels can be added later without replacing the CRM/message core.

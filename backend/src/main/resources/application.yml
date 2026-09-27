@@ -1,0 +1,49 @@
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: irelax-sales-ai
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/irelax_sales_ai}
+    username: ${DATABASE_USERNAME:irelax}
+    password: ${DATABASE_PASSWORD:irelax}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  auth:
+    enabled: ${AUTH_ENABLED:false}
+    issuer-uri: ${SUPABASE_ISSUER_URI:}
+    dev-owner-id: ${DEV_OWNER_ID:nia}
+  twilio:
+    account-sid: ${TWILIO_ACCOUNT_SID:}
+    auth-token: ${TWILIO_AUTH_TOKEN:}
+    phone-number: ${TWILIO_PHONE_NUMBER:}
+    status-callback-url: ${TWILIO_STATUS_CALLBACK_URL:}
+    webhook-base-url: ${TWILIO_WEBHOOK_BASE_URL:}
+    owner-id: ${TWILIO_OWNER_ID:${DEV_OWNER_ID:nia}}
+    mock-enabled: ${TWILIO_MOCK_ENABLED:true}
+  open-ai:
+    api-key: ${OPENAI_API_KEY:}
+    model: ${OPENAI_MODEL:gpt-6-luna}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+  cors:
+    allowed-origins:
+      - ${CORS_ORIGIN_1:http://localhost:8081}
+      - ${CORS_ORIGIN_2:http://localhost:19006}

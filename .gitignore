@@ -1,0 +1,19 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# Java
+backend/target/
+*.class
+
+# Node / Expo
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.iml
